@@ -16,9 +16,9 @@ namespace EDEDSMVisualizer
     {
 
 // ##### SETTINGS ######
-const String pathtojson = @"E:\2017-Q4\Visual Studio\EDEDSMVisualizer\systemsWithCoordinates.json"; // path to the json containing coordinates
-const String output = @"E:\2017-Q4\Visual Studio\EDEDSMVisualizer\output.jpeg";
-static Value2d sol_offset = new Value2d(4000,3000); // where is Sol Located on the Image
+const String pathtojson = @"E:\2017-Q4\Visual Studio\EDSMVis\EDEDSMVisualizer\systemsWithCoordinates.json"; // path to the json containing coordinates
+const String output = @"E:\2017-Q4\Visual Studio\EDSMVis\EDEDSMVisualizer\output.bmp";
+static Value2d sol_offset = new Value2d(5000,2000); // where is Sol Located on the Image
 static Value2d img_res = new Value2d(10000,10000); //Image Resolution  1px = 10x10lyr = 100lyr²
 
 // ##### SETTINGS ######
@@ -33,6 +33,8 @@ static long counter = 0;
             GenerateBitMap();
             ParseJSON();
             bitmap.Save(output);
+            bitmap.Save(@"E:\2017-Q4\Visual Studio\EDSMVis\EDEDSMVisualizer\output.png");
+            bitmap.Save(@"E:\2017-Q4\Visual Studio\EDSMVis\EDEDSMVisualizer\output.jpg");
             Clear();
             Write("Image complete");
             Pause();
@@ -45,7 +47,7 @@ static long counter = 0;
         static void GenerateBitMap()
         {
             Write("Generating Bitmap");
-            bitmap = new FastBitmap(8000,8000);
+            bitmap = new FastBitmap(10000,10000);
         }
         static void ParseJSON()
         {
