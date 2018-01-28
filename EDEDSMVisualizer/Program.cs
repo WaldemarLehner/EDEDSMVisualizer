@@ -23,32 +23,33 @@ namespace EDEDSMVisualizer
 
         // ##### SETTINGS ######
         static FastBitmap bitmap;
-        static long counter = 0;
+        static long counter = 0; // Counts the number of systems that are being parsed.
         
         static void Main(string[] args)
         {
-#if DEBUG
+#if DEBUG   // Only in Debug mode - Application arguments are being overwritten, so one doesnt have to always input json and output directory.
             args = new[] { @"E:\2017-Q4\Visual Studio\EDSMVis\EDEDSMVisualizer\systemsWithCoordinates.json", @"C:\Users\Waldemar L\Documents\" };
 #endif
-            ImportArgs(args);
-            ValidatePathToJson();
-            ValidateOutput();
+            //Here's what the Application does from start to end.
+            ImportArgs(args);                   //Set Application Arguments as pathtojson / output
+            ValidatePathToJson();               //Check if JSON exists, if not, ask user to enter new path
+            ValidateOutput();                   //Check if path exists, if not, create it. Also name the output file (the current date+time).png
             Write("Press any key to start");
             Pause();
             Clear();
             GenerateBitMap();
-            ParseJSON();
-            bitmap.Save(output);
-            Clear();
-            Write("Image complete");
+            ParseJSON();                        //Read to Datastream from the JSON and parse the X and Z values onto the bitmap as x and y
+            bitmap.Save(output);                //Export the final bitmap as png.
+            Clear();    
+            Write("Image complete");            
             Pause();
 
         }
 
-        static void Write(String s) { Console.WriteLine(s); } 
-        static string Read() { return Console.ReadLine(); }
-        static void Pause() { Console.ReadKey();}
-        static void Clear() { Console.Clear();  }
+        static void Write(String s) { Console.WriteLine(s); }   //Shortcut Method to display text in the Console Window
+        static string Read() { return Console.ReadLine(); }     //Shortcut Method to Read the string that is entered by the user
+        static void Pause() { Console.ReadKey();}               //Shortcut Method to Stop execution and wait for a keypress
+        static void Clear() { Console.Clear();  }               //Shortcut Method to Clear Console Content
         static void GenerateBitMap()
         {
             Write("Generating Bitmap");
@@ -58,7 +59,25 @@ namespace EDEDSMVisualizer
         static void ParseJSON() //take the json and just extract the x and z coords and add them to the bitmap.
         {
             
-
+                /* How the JSON is set up:
+                 * 
+                 * [...]
+                 * x : VALUE
+                 * y : VALUE
+                 * z : VLAUE
+                 * [...]
+                 * 
+                 * We need x and z.
+                 * The StreamReader reads it like this:
+                 * x
+                 * VALUE
+                 * y
+                 * VALUE
+                 * z
+                 * VALUE
+                 * .. So we look for "x" only (skiptoX = true), if we find it we use the next reading iteration for its value (thats why there is the boolean "lastX"), skip 3 iterations (for y ; VALUE; z;) and take the next value.
+                 * 
+                 */
                 bool skiptoX = true, lastX = false;
                 byte count = 0;
                 long x = 0, y = 0;
@@ -83,13 +102,13 @@ namespace EDEDSMVisualizer
                         }
 
 
-                        else if(count > 0 && count < 4)
+                        else if(count > 0 && count < 4) // Count 3 Iterations (we starts with count = 1)
                         {
                             count++;
                         }
 
                         
-                        else if (count==4)
+                        else if (count==4) // After 3 Iterations, we read the value and pass it and x to AddToBitmap method while displaying the process on the Console.
                         {
                             y = Convert.ToInt64(streamReader.Value);
                             
@@ -105,42 +124,6 @@ namespace EDEDSMVisualizer
                     }
                 }
 
-
-                /*
-                String line;
-                using (StreamReader reader = new StreamReader(pathtojson))
-                {
-                    while((line = reader.ReadLine()) != null)
-                    {
-                        if (line.Contains("{\"x\":")) //"x":
-                        {
-                            line = line.Substring(line.LastIndexOf("{\"x\":"));
-                            if (line.Contains(",\"id\""))
-                            {
-                                line = line.Substring(0, line.LastIndexOf(",\"id\""));
-                                line = line.Replace(",", ".");
-                                
-                            }
-                            List<long> xyz = new List<long>();
-                            MatchCollection collection = Regex.Matches(line, @"-?(?:\d*\.+)?\d+");
-                            foreach(Match m in collection)
-                            {
-                              int d = (int) Double.Parse(m.Value.Replace(".",","));
-                                xyz.Add(d/10);
-
-                            }
-                            AddToBitmap(xyz.ElementAt(0), xyz.ElementAt(2));
-                            counter++;
-                           
-                        }
-                    }*/
-
-
-
-               // }
-
-                
-            
             
         }
         static public void ImportArgs(string[] args)
@@ -169,13 +152,13 @@ namespace EDEDSMVisualizer
         static public void AddToBitmap(long _x,long _y)
         
         {
-            
+            //The Origin gets an offset
             int bitmap_x = (int)(_x/10 + sol_offset._x);
             int bitmap_y = (int)(img_res._y)-(int)(_y/10 + sol_offset._y);
 
-
+            //we get the color-value. (since it's greyscale R = G = B)
             int systems_amount = bitmap.GetPixel(bitmap_x, bitmap_y).R;
-          if(systems_amount < 253)
+          if(systems_amount < 253) //We count up if we dont cause a byte overflow
             {
                 systems_amount = systems_amount + 3;
                 FastColor c = new FastColor();
@@ -185,7 +168,7 @@ namespace EDEDSMVisualizer
                 Write("["+counter+"]\n"+bitmap_x + " " + bitmap_y + "@ " + c.R);
                 bitmap.SetPixel(bitmap_x, bitmap_y, c);
             }
-          else if(systems_amount > 252 && systems_amount < 255)
+          else if(systems_amount > 252 && systems_amount < 255) //if we would've caused a byte overflow we just set the value to byte.maximum (255)
             {
                 systems_amount = 255;
                 FastColor c = new FastColor();
