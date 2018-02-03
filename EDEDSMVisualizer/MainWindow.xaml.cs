@@ -12,17 +12,25 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MahApps.Metro.Controls;
+
 
 namespace EDEDSMVisualizer
 {
     /// <summary>
     /// Interaktionslogik für MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
         public MainWindow()
         {
             InitializeComponent();
+            ((App)Application.Current).PassMainWindow(this); // Pass Reference to this Instance of MainWindow so other classes can find it and set its content
+            ChangeUI(new pages.MainMenu());
+        }
+        public void ChangeUI<T>(T page)
+        {
+            this.contentControl.Content = page;
         }
     }
 }

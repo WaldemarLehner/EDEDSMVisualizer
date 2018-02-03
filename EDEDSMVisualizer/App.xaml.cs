@@ -13,5 +13,14 @@ namespace EDEDSMVisualizer
     /// </summary>
     public partial class App : Application
     {
+        static MainWindow mainWindow;
+        public void PassMainWindow(MainWindow window)
+        {
+            MainWindow = window;
+        }
+        public MainWindow GetMainWindow()
+        {
+            return mainWindow;
+        }
     }
 }
