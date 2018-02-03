@@ -35,7 +35,7 @@
 
             </Grid.RowDefinitions>
 
-            <Grid x:Name="action_addedsmjson" Cursor="Hand" Grid.Row="1" Grid.Column="1" Background="Transparent">
+            <Grid x:Name="action_addedsmjson" Cursor="Hand" Grid.Row="1" Grid.Column="1" Background="Transparent" MouseUp="SetInputLocation">
 
                 <Grid.Style>
                     <Style TargetType="{x:Type Grid}">
@@ -50,7 +50,7 @@
                     </Style>
                 </Grid.Style>
 
-                <Border BorderBrush="#cf5a07" BorderThickness="1" MouseUp="SetInputLocation">
+                <Border BorderBrush="#cf5a07" BorderThickness="1" >
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50px"/>
@@ -65,7 +65,7 @@
                 </Border>
 
             </Grid>
-            <Grid x:Name="action_setoutput" Cursor="Hand" Grid.Row="3" Grid.Column="1" Background="Transparent">
+            <Grid x:Name="action_setoutput" Cursor="Hand" Grid.Row="3" Grid.Column="1" Background="Transparent" MouseUp="SetOutputLocation">
                 <Grid.Style>
                     <Style TargetType="{x:Type Grid}">
                         <Style.Triggers>
@@ -78,7 +78,7 @@
                         </Style.Triggers>
                     </Style>
                 </Grid.Style>
-                <Border BorderBrush="#cf5a07" BorderThickness="1" MouseUp="SetOutputLocation">
+                <Border BorderBrush="#cf5a07" BorderThickness="1" >
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50px"/>
@@ -140,7 +140,7 @@
 
 
             </GroupBox>
-            <Grid x:Name="action_startcalc" Cursor="Hand" Grid.Row="7" Grid.Column="1" Background="Transparent" Margin="0">
+            <Grid x:Name="action_startcalc" Cursor="Hand" Grid.Row="7" Grid.Column="1" Background="Transparent" Margin="0" MouseUp="StartImageCalculation">
                 <Grid.Style>
                     <Style TargetType="{x:Type Grid}">
                         <Style.Triggers>
@@ -153,7 +153,7 @@
                         </Style.Triggers>
                     </Style>
                 </Grid.Style>
-                <Border BorderBrush="#cf5a07" BorderThickness="1" MouseUp="StartImageCalculation" Padding="0">
+                <Border BorderBrush="#cf5a07" BorderThickness="1"  Padding="0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50px"/>
