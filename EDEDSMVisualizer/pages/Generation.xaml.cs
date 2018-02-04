@@ -8,17 +8,17 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+
 using System.Windows.Navigation;
 using System.ComponentModel;
-using System.Windows.Shapes;
-using ColorMine.ColorSpaces;
 
+using ColorMine.ColorSpaces;
+using System.Drawing;
 using FastBitmapLib;
+
 using System.IO;
 using Newtonsoft.Json;
-
+using System.Drawing.Drawing2D;
 
 namespace EDEDSMVisualizer.pages
 {
@@ -46,12 +46,6 @@ namespace EDEDSMVisualizer.pages
              task = Task.Factory.StartNew(() => ParseJSON());
             
            
-
-
-            
-           
-            
-
 
         }
         void Write(String s)
@@ -279,7 +273,6 @@ namespace EDEDSMVisualizer.pages
 
 
             #endregion
-
             #region using Red
             else if (settings.Rendering == 4)
             {
@@ -377,9 +370,80 @@ namespace EDEDSMVisualizer.pages
             }
             #endregion
 
+            //Additional Manipulation
+            if (settings.Scaling || settings.Radial5kly || settings.Radial10kly || settings.Axial5kly || settings.Axial10kly || settings.ColorTable || settings.EDSMIcon)
+            {
+
+                // add a scale
+                int thousand_ly_in_px = 1000 / settings.Ly_to_px;
+                Bitmap _bitmap = bitmap;
+                using (var graphics = Graphics.FromImage(_bitmap))
+                {
+                    if (settings.Scaling)
+                    {
+                        int img_y = (int)settings.Img_Yres;
+                        Rectangle[] filledrectangle = 
+                        {   new Rectangle(50,                       img_y-200,thousand_ly_in_px,100),
+                            new Rectangle(50+2*thousand_ly_in_px,   img_y-200,thousand_ly_in_px,100),
+                            new Rectangle(50+4*thousand_ly_in_px,   img_y-200,thousand_ly_in_px,100),
+                            new Rectangle(50+6*thousand_ly_in_px,   img_y-200,thousand_ly_in_px,100),
+                            new Rectangle(50+8*thousand_ly_in_px,   img_y-200,thousand_ly_in_px,100),
+
+                            new Rectangle(50,                       img_y-120,thousand_ly_in_px*10,20)
+                        };
+                        Rectangle[] hollowrectangle =
+                        {
+                            new Rectangle(50+1*thousand_ly_in_px,   img_y-200,thousand_ly_in_px,100),
+                            new Rectangle(50+3*thousand_ly_in_px,   img_y-200,thousand_ly_in_px,100),
+                            new Rectangle(50+5*thousand_ly_in_px,   img_y-200,thousand_ly_in_px,100),
+                            new Rectangle(50+7*thousand_ly_in_px,   img_y-200,thousand_ly_in_px,100),
+                            new Rectangle(50+9*thousand_ly_in_px,   img_y-200,thousand_ly_in_px,100),
+                        };
+                       
+                        graphics.FillRectangles(new SolidBrush(Color.White), filledrectangle);
+                        graphics.DrawRectangles(new Pen(Color.White), hollowrectangle);
+                        
+
+
+                        graphics.DrawString("10.000ly", new Font("Arial", 100), new SolidBrush(Color.White), new PointF(50, settings.Img_Yres - 350));
+                    }
+                    if (settings.ColorTable)
+                    {
+                        PointF offset = new PointF(50, settings.Img_Yres - 500);
+                        int maxvalue;
+                        switch (settings.Rendering)
+                        {
+                            case 0:
+                            case 1:
+                            case 4:
+                            case 5:
+                            case 6:
+                            case 7:
+                                maxvalue = settings.Systems_per_ColorVal * 255; // max value is a byte (rgb)
+                                break;
+                            default:
+                                maxvalue = settings.Systems_per_ColorVal * 360; // max value is 360° (hsv)
+                                break;
+
+                            
+                        }
+                        if(settings.Rendering == 0 || settings.Rendering == 1)
+                        {
+                            LinearGradientBrush linearGradient = new LinearGradientBrush() // WIP
+                        }
+
+
+                    }
+                }
+                bitmap = _bitmap;
+                
+            }
+
             string file = settings.Path_output + "/" + DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".png";
-            bitmap.Save(file);
+            Dispatcher.BeginInvoke((Action)(() => { Write("Saving Image..."); }));
+                bitmap.Save(file);
             bitmap = null;
+            
             sysmap = null;
             Dispatcher.BeginInvoke((Action)(() => {
                 Write($"Image was sucessfully generated.");
