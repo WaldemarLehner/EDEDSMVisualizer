@@ -161,7 +161,7 @@ namespace EDEDSMVisualizer.pages
                 
             }
             Dispatcher.BeginInvoke((Action)(() => { Write($"{counter} Systems parsed. \n Applying to Bitmap."); }));
-
+            
             // Plot 2dArray onto bitmap, using selected method
              bitmap = new FastBitmap((int)settings.Img_Xres,(int)settings.Img_Yres);
             
@@ -387,7 +387,7 @@ namespace EDEDSMVisualizer.pages
                          */
                         int modulo = (int)(settings.Img_Xres - settings.Img_X_offset) % (50000 / thousand_ly_in_px);
                         int iterator = 0;
-                        Pen pen = new Pen(Color.DarkRed, 3);
+                        Pen pen = new Pen(Color.FromArgb(100,200,0,0), 2);
                         while (1==1)
                         {
                             if(modulo+iterator* 500 / thousand_ly_in_px < settings.Img_Xres)
@@ -415,10 +415,78 @@ namespace EDEDSMVisualizer.pages
                                 break;
                             }
                         }
-
-
+                    }
+                    if (settings.Axial10kly)
+                    {
+                        /*
+                         * Take Modulo from Sol to x=0/y=0, then start from this Modulo until pointer is out of Image bounds
+                         * Start with Horizontal lines (changing x), then Vertical Lines (changing y)
+                         */
+                        int modulo = (int)(settings.Img_Xres - settings.Img_X_offset) % (100000 / thousand_ly_in_px);
+                        int iterator = 0;
+                        Pen pen = new Pen(Color.FromArgb(255, 200, 0, 0), 3);
+                        while (modulo + iterator * 1000 / thousand_ly_in_px < settings.Img_Xres)
+                        {
+                                graphics.DrawLine(pen, modulo + iterator * 100000 / thousand_ly_in_px, 0, modulo + iterator * 100000 / thousand_ly_in_px, settings.Img_Xres);
+                                iterator++;
+                        }
+                        iterator = 0;
+                        modulo = (int)(settings.Img_Yres - settings.Img_Y_offset) % (100000 / thousand_ly_in_px);
+                        while (modulo + iterator * 100000 / thousand_ly_in_px < settings.Img_Yres)
+                        {
+                                graphics.DrawLine(pen, 0, modulo + iterator * 100000 / thousand_ly_in_px, settings.Img_Yres, modulo + iterator * 100000 / thousand_ly_in_px);
+                                iterator++;
+                        }
                     }
 
+                    if (settings.Radial5kly)
+                    {
+                        int maxval;
+                        if(settings.Img_Xres > settings.Img_Yres)
+                        {
+                            maxval = (int)(settings.Img_Xres * 1.5);
+                        }
+                        else
+                        {
+                            maxval = (int)(settings.Img_Yres * 1.5);
+                        }
+                        int iterator = 1;
+                        while (settings.Img_X_offset - iterator * 20000 < maxval &&iterator<100)
+                        {  
+                                int rectangle_x = settings.Img_X_offset - (iterator * 5000 / settings.Ly_to_px);
+                                int rectangle_y = (int)(settings.Img_Yres - settings.Img_Y_offset) - iterator * 5000 / settings.Ly_to_px;
+                                int rectangle_hw = iterator * 10000 / settings.Ly_to_px;
+                                Rectangle rect = new Rectangle(rectangle_x,rectangle_y,rectangle_hw,rectangle_hw);
+                                 graphics.DrawEllipse(new Pen(Color.FromArgb(100, 200, 0, 0), 3),
+                                    rect);
+                                 iterator++;  
+                        } 
+
+                    }
+                    if (settings.Radial10kly)
+                    {
+                        int maxval;
+                        if (settings.Img_Xres > settings.Img_Yres)
+                        {
+                            maxval = (int)(settings.Img_Xres * 1.5);
+                        }
+                        else
+                        {
+                            maxval = (int)(settings.Img_Yres * 1.5);
+                        }
+                        int iterator = 1;
+                        while (settings.Img_X_offset - iterator * 40000 < maxval&& iterator < 100)
+                        {
+                            int rectangle_x = settings.Img_X_offset - (iterator * 10000 / settings.Ly_to_px);
+                            int rectangle_y = (int)(settings.Img_Yres - settings.Img_Y_offset) - iterator * 10000 / settings.Ly_to_px;
+                            int rectangle_hw = iterator * 20000 / settings.Ly_to_px;
+                            Rectangle rect = new Rectangle(rectangle_x, rectangle_y, rectangle_hw, rectangle_hw);
+                            graphics.DrawEllipse(new Pen(Color.FromArgb(100, 250, 0, 0), 4),
+                               rect);
+                            iterator++;
+                        }
+
+                    }
 
                     if (settings.Scaling)
                     {
@@ -522,7 +590,7 @@ namespace EDEDSMVisualizer.pages
                 loadingicon.Visibility = Visibility.Hidden;
             }));
             System.Diagnostics.Process.Start(file); // Display image with default Image Displaying Software
-
+            System.Windows.Application.Current.Shutdown(); // Close Application
 
         }
          
