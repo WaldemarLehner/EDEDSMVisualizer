@@ -172,7 +172,7 @@ namespace EDEDSMVisualizer.pages
                 settings.Img_X_offset = (xoffset.Value != null)?(int)xoffset.Value:5000;
                 settings.Img_Y_offset = (yoffset.Value != null)?(int)yoffset.Value:2000;
                 settings.Ly_to_px = (lyppx.Value != null)?(int)lyppx.Value:10;
-                settings.Systems_per_ColorVal = (syspval.Value != null)?(int)syspval.Value:1;
+                settings.ColorValPerSystem = (syspval.Value != null)?(int)syspval.Value:1;
 
                 settings.Axial5kly = (bool)ax5kly.IsChecked;
                 settings.Axial10kly = (bool)ax10kly.IsChecked;

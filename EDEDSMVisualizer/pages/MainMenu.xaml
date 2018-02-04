@@ -124,7 +124,7 @@
                     <Controls:NumericUpDown x:Name="xoffset" Minimum="0" Maximum="20000" Grid.Row="2" Grid.Column="1" adorners:Watermark.Text="x-Offset        (max:20000)"/>
                     <Controls:NumericUpDown x:Name="yoffset" Minimum="0" Maximum="20000" Grid.Row="3" Grid.Column="1" adorners:Watermark.Text="y-Offset        (max:20000)"/>
                     <Controls:NumericUpDown x:Name="lyppx" Minimum="1" Maximum="1000" Grid.Row="4" Grid.Column="1" adorners:Watermark.Text="Lightyears / pixel (default:10)"/>
-                    <Controls:NumericUpDown x:Name="syspval" Minimum="1" Maximum="360" Grid.Row="4" Grid.Column="1" adorners:Watermark.Text="Systems / Value (default:1) - For more contrast use higher value"/>
+                    <Controls:NumericUpDown x:Name="syspval" Minimum="1" Maximum="360" Grid.Row="4" Grid.Column="1" adorners:Watermark.Text="Values / system (default:1) - For more contrast use higher value"/>
 
 
 

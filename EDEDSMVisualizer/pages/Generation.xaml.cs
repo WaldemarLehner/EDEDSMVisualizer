@@ -76,7 +76,7 @@ namespace EDEDSMVisualizer.pages
         void UpdateThread(object sender, DoWorkEventArgs e) {
                 
         }
-         void ParseJSON()
+        void ParseJSON()
         {
             
             
@@ -183,7 +183,7 @@ namespace EDEDSMVisualizer.pages
                 {
                     for(int iteration_y = 0; iteration_y < sysmap[iteration_x].Length; iteration_y++)
                     {
-                        uint value = Convert.ToUInt32(sysmap[iteration_x][iteration_y]*settings.Systems_per_ColorVal);
+                        uint value = Convert.ToUInt32(sysmap[iteration_x][iteration_y]*settings.ColorValPerSystem);
                         byte greyscale;
                         if (value > 255)
                         {
@@ -213,7 +213,7 @@ namespace EDEDSMVisualizer.pages
                 {
                     for (int iteration_y = 0; iteration_y < sysmap[iteration_x].Length; iteration_y++)
                     {
-                        uint value = Convert.ToUInt32(sysmap[iteration_x][iteration_y] * settings.Systems_per_ColorVal);
+                        uint value = Convert.ToUInt32(sysmap[iteration_x][iteration_y] * settings.ColorValPerSystem);
                         
                         
                         if(value > 180) { value = value - 180; } // MOve Hue by 180 Degreen so blue is 0 and Red is maximum
@@ -242,7 +242,7 @@ namespace EDEDSMVisualizer.pages
                 {
                     for (int iteration_y = 0; iteration_y < sysmap[iteration_x].Length; iteration_y++)
                     {
-                        uint value = Convert.ToUInt32(sysmap[iteration_x][iteration_y] * settings.Systems_per_ColorVal);
+                        uint value = Convert.ToUInt32(sysmap[iteration_x][iteration_y] * settings.ColorValPerSystem);
                         uint value_greyscale;
                         if (value > 360)
                         {
@@ -283,7 +283,7 @@ namespace EDEDSMVisualizer.pages
                     {
                         for (int iteration_y = 0; iteration_y < sysmap[iteration_x].Length; iteration_y++)
                         {
-                            uint value = Convert.ToUInt32(sysmap[iteration_x][iteration_y] * settings.Systems_per_ColorVal);
+                            uint value = Convert.ToUInt32(sysmap[iteration_x][iteration_y] * settings.ColorValPerSystem);
                             byte greyscale;
                             if (value > 255)
                             {
@@ -315,7 +315,7 @@ namespace EDEDSMVisualizer.pages
                 {
                     for (int iteration_y = 0; iteration_y < sysmap[iteration_x].Length; iteration_y++)
                     {
-                        uint value = Convert.ToUInt32(sysmap[iteration_x][iteration_y] * settings.Systems_per_ColorVal);
+                        uint value = Convert.ToUInt32(sysmap[iteration_x][iteration_y] * settings.ColorValPerSystem);
                         byte greyscale;
                         if (value > 255)
                         {
@@ -347,7 +347,7 @@ namespace EDEDSMVisualizer.pages
                 {
                     for (int iteration_y = 0; iteration_y < sysmap[iteration_x].Length; iteration_y++)
                     {
-                        uint value = Convert.ToUInt32(sysmap[iteration_x][iteration_y] * settings.Systems_per_ColorVal);
+                        uint value = Convert.ToUInt32(sysmap[iteration_x][iteration_y] * settings.ColorValPerSystem);
                         byte greyscale;
                         if (value > 255)
                         {
@@ -379,6 +379,47 @@ namespace EDEDSMVisualizer.pages
                 Bitmap _bitmap = bitmap;
                 using (var graphics = Graphics.FromImage(_bitmap))
                 {
+                    if (settings.Axial5kly)
+                    {
+                        /*
+                         * Take Modulo from Sol to x=0/y=0, then start from this Modulo until pointer is out of Image bounds
+                         * Start with Horizontal lines (changing x), then Vertical Lines (changing y)
+                         */
+                        int modulo = (int)(settings.Img_Xres - settings.Img_X_offset) % (50000 / thousand_ly_in_px);
+                        int iterator = 0;
+                        Pen pen = new Pen(Color.DarkRed, 3);
+                        while (1==1)
+                        {
+                            if(modulo+iterator* 500 / thousand_ly_in_px < settings.Img_Xres)
+                            {
+                                graphics.DrawLine(pen, modulo + iterator * 50000 / thousand_ly_in_px, 0, modulo + iterator * 50000 / thousand_ly_in_px, settings.Img_Xres);
+                                iterator++;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                            
+                        }
+                        iterator = 0;
+                        modulo  = (int)(settings.Img_Yres - settings.Img_Y_offset) % (50000 / thousand_ly_in_px);
+                        while (1 == 1)
+                        {
+                            if (modulo + iterator * 50000/thousand_ly_in_px < settings.Img_Yres)
+                            {
+                                graphics.DrawLine(pen,0,modulo + iterator*50000 / thousand_ly_in_px, settings.Img_Yres,modulo+iterator*50000 / thousand_ly_in_px);
+                                iterator++;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+
+
+                    }
+
+
                     if (settings.Scaling)
                     {
                         int img_y = (int)settings.Img_Yres;
@@ -409,7 +450,7 @@ namespace EDEDSMVisualizer.pages
                     }
                     if (settings.ColorTable)
                     {
-                        PointF offset = new PointF(50, settings.Img_Yres - 500);
+                        PointF offset = new PointF(50, settings.Img_Yres - 420);
                         int maxvalue;
                         switch (settings.Rendering)
                         {
@@ -419,18 +460,49 @@ namespace EDEDSMVisualizer.pages
                             case 5:
                             case 6:
                             case 7:
-                                maxvalue = settings.Systems_per_ColorVal * 255; // max value is a byte (rgb)
+                                maxvalue = 255/settings.ColorValPerSystem; // max value is a byte (rgb)
                                 break;
                             default:
-                                maxvalue = settings.Systems_per_ColorVal * 360; // max value is 360° (hsv)
+                                maxvalue = 360/settings.ColorValPerSystem ; // max value is 360° (hsv)
                                 break;
 
                             
                         }
-                        if(settings.Rendering == 0 || settings.Rendering == 1)
+                        if(settings.Rendering == 0 || settings.Rendering == 1) // Grey
                         {
-                            LinearGradientBrush linearGradient = new LinearGradientBrush() // WIP
+                            using (LinearGradientBrush br = new LinearGradientBrush(new Rectangle((int)offset.X, (int)offset.Y - 100, thousand_ly_in_px*10, 100), Color.Black, Color.White, (float)0))
+                            {
+                                graphics.FillRectangle(br, new Rectangle((int)offset.X, (int)offset.Y - 100, thousand_ly_in_px*10, 100));
+                           
+                            }
                         }
+                        else if (settings.Rendering == 4) // Red
+                        {
+                            using (LinearGradientBrush br = new LinearGradientBrush(new Rectangle((int)offset.X, (int)offset.Y - 100, thousand_ly_in_px * 10, 100), Color.Black, Color.Red, (float)0))
+                            {
+                                graphics.FillRectangle(br, new Rectangle((int)offset.X, (int)offset.Y - 100, thousand_ly_in_px * 10, 100));
+                            }
+                        }
+                        else if (settings.Rendering == 5) // Green
+                        {
+                            using (LinearGradientBrush br = new LinearGradientBrush(new Rectangle((int)offset.X, (int)offset.Y - 100, thousand_ly_in_px * 10, 100), Color.Black, Color.Green, (float)0))
+                            {
+                                graphics.FillRectangle(br, new Rectangle((int)offset.X, (int)offset.Y - 100, thousand_ly_in_px * 10, 100));
+                         
+                            }
+                        }
+                        else if (settings.Rendering == 6) // Blue
+                        {
+                            using (LinearGradientBrush br = new LinearGradientBrush(new Rectangle((int)offset.X, (int)offset.Y - 100, thousand_ly_in_px * 10, 100), Color.Black, Color.Blue, (float)0))
+                            {
+                                graphics.FillRectangle(br, new Rectangle((int)offset.X, (int)offset.Y - 100, thousand_ly_in_px * 10, 100));
+                      
+                            }
+                        }
+                        graphics.DrawRectangle(new Pen(Color.White), new Rectangle((int)offset.X, (int)offset.Y - 100, thousand_ly_in_px * 10, 100));
+                        graphics.DrawString("0", new Font("Arial", 100), new SolidBrush(Color.White), new PointF(offset.X, offset.Y - 310));
+                        graphics.DrawString(maxvalue + "+", new Font("Arial", 100), new SolidBrush(Color.White), new PointF(offset.X + 10 * thousand_ly_in_px - 200, offset.Y - 310));
+
 
 
                     }
@@ -453,6 +525,7 @@ namespace EDEDSMVisualizer.pages
 
 
         }
+         
     }
     
 }

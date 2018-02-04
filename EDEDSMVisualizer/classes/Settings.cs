@@ -20,7 +20,7 @@ namespace EDEDSMVisualizer.classes
         public int Img_X_offset { get; set; }
         public int Img_Y_offset { get; set; }
 
-        public int Systems_per_ColorVal { get; set; } // How many systems are represented by 1 color val
+        public int ColorValPerSystem { get; set; } // How many systems are represented by 1 color val
         public int Ly_to_px { get; set; } // How many Ly are in 1 px
 
         //Gridlines
